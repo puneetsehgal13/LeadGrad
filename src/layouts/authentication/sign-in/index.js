@@ -2,21 +2,10 @@
 =========================================================
 * Material Dashboard 2 React - v2.2.0
 =========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -29,22 +18,69 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
 
-// Material Dashboard 2 React components
+// MD2 components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-// Authentication layout components
+// Layout
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
-// Images
+// BG
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
-function Basic() {
+// Supabase
+import { supabase } from "../../../lib/supabase";
+
+export default function SignIn() {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [err, setErr] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // If already signed in, skip this page
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) navigate("/dashboard", { replace: true });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session) navigate("/dashboard", { replace: true });
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
+
+    // IMPORTANT: capture the 'data' object under a unique name
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      console.error("Sign-in error:", error);
+      setErr(error.message || "Sign-in failed");
+      return;
+    }
+
+    if (signInData?.session) {
+      // Supabase session exists -> go to dashboard
+      navigate("/dashboard", { replace: true });
+    } else {
+      setErr("No session returned from Supabase.");
+    }
+  }
 
   return (
     <BasicLayout image={bgImage}>
@@ -81,13 +117,28 @@ function Basic() {
             </Grid>
           </Grid>
         </MDBox>
+
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput
+                type="email"
+                label="Email"
+                fullWidth
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput
+                type="password"
+                label="Password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -102,10 +153,23 @@ function Basic() {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
+              <MDButton variant="gradient" color="info" fullWidth type="submit" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
               </MDButton>
             </MDBox>
+
+            {err && (
+              <MDTypography
+                color="error"
+                variant="button"
+                display="block"
+                textAlign="center"
+                mt={1}
+              >
+                {err}
+              </MDTypography>
+            )}
+
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
                 Don&apos;t have an account?{" "}
@@ -127,5 +191,3 @@ function Basic() {
     </BasicLayout>
   );
 }
-
-export default Basic;
