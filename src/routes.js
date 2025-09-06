@@ -6,25 +6,30 @@ import SignOut from "layouts/authentication/sign-out";
 import Icon from "@mui/material/Icon";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Dummy pages (make sure these exist under src/pages/…)
+// Learner
 import MyCourses from "pages/learner/MyCourses";
 import Assignments from "pages/learner/Assignments";
 import Certificates from "pages/learner/Certificates";
+import CourseOverview from "pages/learner/CourseOverview";
+import LearnShell from "pages/learner/LearnShell";
 
+// Instructor
 import InstructorCourses from "pages/instructor/CourseManagement";
 import QuizBuilder from "pages/instructor/QuizBuilder";
 import Gradebook from "pages/instructor/Gradebook";
 
+// Manager
 import TeamDashboard from "pages/manager/TeamDashboard";
 import Reports from "pages/manager/Reports";
 import AssignCourses from "pages/manager/AssignCourses";
 
+// Admin
 import UsersAdmin from "pages/admin/Users";
 import RolesAdmin from "pages/admin/Roles";
 import PlatformSettings from "pages/admin/PlatformSettings";
 
 const routes = [
-  // --- Public ---
+  // ---------- Public ----------
   {
     type: "collapse",
     name: "Sign In",
@@ -34,7 +39,7 @@ const routes = [
     component: <SignIn />,
   },
 
-  // --- Core ---
+  // ---------- Core ----------
   {
     type: "collapse",
     name: "Dashboard",
@@ -60,7 +65,7 @@ const routes = [
     ),
   },
 
-  // --- Learner Section ---
+  // ---------- Learner ----------
   { type: "title", title: "Learner", key: "learner-title" },
   {
     type: "collapse",
@@ -99,7 +104,7 @@ const routes = [
     ),
   },
 
-  // --- Instructor Section ---
+  // ---------- Instructor ----------
   { type: "title", title: "Instructor", key: "instructor-title" },
   {
     type: "collapse",
@@ -108,7 +113,7 @@ const routes = [
     icon: <Icon fontSize="small">menu_book</Icon>,
     route: "/instructor/courses",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["instructor", "admin"]}>
         <InstructorCourses />
       </ProtectedRoute>
     ),
@@ -120,7 +125,7 @@ const routes = [
     icon: <Icon fontSize="small">fact_check</Icon>,
     route: "/instructor/quizzes",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["instructor", "admin"]}>
         <QuizBuilder />
       </ProtectedRoute>
     ),
@@ -132,13 +137,13 @@ const routes = [
     icon: <Icon fontSize="small">checklist</Icon>,
     route: "/instructor/gradebook",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["instructor", "admin"]}>
         <Gradebook />
       </ProtectedRoute>
     ),
   },
 
-  // --- Manager Section ---
+  // ---------- Manager ----------
   { type: "title", title: "Manager", key: "manager-title" },
   {
     type: "collapse",
@@ -147,7 +152,7 @@ const routes = [
     icon: <Icon fontSize="small">groups</Icon>,
     route: "/manager/team",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["manager", "admin"]}>
         <TeamDashboard />
       </ProtectedRoute>
     ),
@@ -159,7 +164,7 @@ const routes = [
     icon: <Icon fontSize="small">bar_chart</Icon>,
     route: "/manager/reports",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["manager", "admin"]}>
         <Reports />
       </ProtectedRoute>
     ),
@@ -171,13 +176,13 @@ const routes = [
     icon: <Icon fontSize="small">add_circle</Icon>,
     route: "/manager/assign",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["manager", "admin"]}>
         <AssignCourses />
       </ProtectedRoute>
     ),
   },
 
-  // --- Admin Section ---
+  // ---------- Admin ----------
   { type: "title", title: "Admin", key: "admin-title" },
   {
     type: "collapse",
@@ -186,7 +191,7 @@ const routes = [
     icon: <Icon fontSize="small">people</Icon>,
     route: "/admin/users",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["admin"]}>
         <UsersAdmin />
       </ProtectedRoute>
     ),
@@ -198,7 +203,7 @@ const routes = [
     icon: <Icon fontSize="small">security</Icon>,
     route: "/admin/roles",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["admin"]}>
         <RolesAdmin />
       </ProtectedRoute>
     ),
@@ -210,16 +215,16 @@ const routes = [
     icon: <Icon fontSize="small">settings</Icon>,
     route: "/admin/settings",
     component: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={["admin"]}>
         <PlatformSettings />
       </ProtectedRoute>
     ),
   },
 
-  // --- Divider ---
+  // ---------- Divider ----------
   { type: "divider", key: "bottom-divider" },
 
-  // --- Sign Out ---
+  // ---------- Auth ----------
   {
     type: "collapse",
     name: "Sign Out",
@@ -227,6 +232,53 @@ const routes = [
     icon: <Icon fontSize="small">logout</Icon>,
     route: "/authentication/sign-out",
     component: <SignOut />,
+  },
+
+  // ---------- Hidden/utility routes (not in sidebar) ----------
+  // Optional alias to support old links or a simpler path
+  {
+    type: "route",
+    name: "My Courses (alias)",
+    key: "my-courses-alias",
+    route: "/my-courses",
+    component: (
+      <ProtectedRoute>
+        <MyCourses />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "route",
+    name: "Course Overview",
+    key: "course-overview",
+    route: "/courses/:courseId",
+    component: (
+      <ProtectedRoute>
+        <CourseOverview />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "route",
+    name: "Course Learn",
+    key: "course-learn",
+    route: "/courses/:courseId/learn/:type/:id",
+    component: (
+      <ProtectedRoute>
+        <LearnShell />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "route",
+    name: "Course Learn Root",
+    key: "course-learn-root",
+    route: "/courses/:courseId/learn",
+    component: (
+      <ProtectedRoute>
+        <LearnShell />
+      </ProtectedRoute>
+    ),
   },
 ];
 
