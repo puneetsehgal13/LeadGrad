@@ -1,18 +1,30 @@
 // routes.js
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+import SignOut from "layouts/authentication/sign-out";
 import Icon from "@mui/material/Icon";
 import ProtectedRoute from "./components/ProtectedRoute";
-import SignOut from "layouts/authentication/sign-out";
+
+// Dummy pages (make sure these exist under src/pages/…)
+import MyCourses from "pages/learner/MyCourses";
+import Assignments from "pages/learner/Assignments";
+import Certificates from "pages/learner/Certificates";
+
+import InstructorCourses from "pages/instructor/CourseManagement";
+import QuizBuilder from "pages/instructor/QuizBuilder";
+import Gradebook from "pages/instructor/Gradebook";
+
+import TeamDashboard from "pages/manager/TeamDashboard";
+import Reports from "pages/manager/Reports";
+import AssignCourses from "pages/manager/AssignCourses";
+
+import UsersAdmin from "pages/admin/Users";
+import RolesAdmin from "pages/admin/Roles";
+import PlatformSettings from "pages/admin/PlatformSettings";
 
 const routes = [
-  // Public pages (kept as 'collapse' so they always mount in the template)
+  // --- Public ---
   {
     type: "collapse",
     name: "Sign In",
@@ -21,16 +33,8 @@ const routes = [
     route: "/authentication/sign-in",
     component: <SignIn />,
   },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
-  },
 
-  // Secured pages
+  // --- Core ---
   {
     type: "collapse",
     name: "Dashboard",
@@ -40,54 +44,6 @@ const routes = [
     component: (
       <ProtectedRoute>
         <Dashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: (
-      <ProtectedRoute>
-        <Tables />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: (
-      <ProtectedRoute>
-        <Billing />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: (
-      <ProtectedRoute>
-        <RTL />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: (
-      <ProtectedRoute>
-        <Notifications />
       </ProtectedRoute>
     ),
   },
@@ -103,6 +59,167 @@ const routes = [
       </ProtectedRoute>
     ),
   },
+
+  // --- Learner Section ---
+  { type: "title", title: "Learner", key: "learner-title" },
+  {
+    type: "collapse",
+    name: "My Courses",
+    key: "learner-my-courses",
+    icon: <Icon fontSize="small">school</Icon>,
+    route: "/learner/courses",
+    component: (
+      <ProtectedRoute>
+        <MyCourses />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Assignments",
+    key: "learner-assignments",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/learner/assignments",
+    component: (
+      <ProtectedRoute>
+        <Assignments />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Certificates",
+    key: "learner-certificates",
+    icon: <Icon fontSize="small">emoji_events</Icon>,
+    route: "/learner/certificates",
+    component: (
+      <ProtectedRoute>
+        <Certificates />
+      </ProtectedRoute>
+    ),
+  },
+
+  // --- Instructor Section ---
+  { type: "title", title: "Instructor", key: "instructor-title" },
+  {
+    type: "collapse",
+    name: "Course Management",
+    key: "instr-courses",
+    icon: <Icon fontSize="small">menu_book</Icon>,
+    route: "/instructor/courses",
+    component: (
+      <ProtectedRoute>
+        <InstructorCourses />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Quiz Builder",
+    key: "instr-quiz-builder",
+    icon: <Icon fontSize="small">fact_check</Icon>,
+    route: "/instructor/quizzes",
+    component: (
+      <ProtectedRoute>
+        <QuizBuilder />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Gradebook",
+    key: "instr-gradebook",
+    icon: <Icon fontSize="small">checklist</Icon>,
+    route: "/instructor/gradebook",
+    component: (
+      <ProtectedRoute>
+        <Gradebook />
+      </ProtectedRoute>
+    ),
+  },
+
+  // --- Manager Section ---
+  { type: "title", title: "Manager", key: "manager-title" },
+  {
+    type: "collapse",
+    name: "Team Dashboard",
+    key: "mgr-team",
+    icon: <Icon fontSize="small">groups</Icon>,
+    route: "/manager/team",
+    component: (
+      <ProtectedRoute>
+        <TeamDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Reports",
+    key: "mgr-reports",
+    icon: <Icon fontSize="small">bar_chart</Icon>,
+    route: "/manager/reports",
+    component: (
+      <ProtectedRoute>
+        <Reports />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Assign Courses",
+    key: "mgr-assign",
+    icon: <Icon fontSize="small">add_circle</Icon>,
+    route: "/manager/assign",
+    component: (
+      <ProtectedRoute>
+        <AssignCourses />
+      </ProtectedRoute>
+    ),
+  },
+
+  // --- Admin Section ---
+  { type: "title", title: "Admin", key: "admin-title" },
+  {
+    type: "collapse",
+    name: "User Management",
+    key: "admin-users",
+    icon: <Icon fontSize="small">people</Icon>,
+    route: "/admin/users",
+    component: (
+      <ProtectedRoute>
+        <UsersAdmin />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Role Settings",
+    key: "admin-roles",
+    icon: <Icon fontSize="small">security</Icon>,
+    route: "/admin/roles",
+    component: (
+      <ProtectedRoute>
+        <RolesAdmin />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Platform Settings",
+    key: "admin-settings",
+    icon: <Icon fontSize="small">settings</Icon>,
+    route: "/admin/settings",
+    component: (
+      <ProtectedRoute>
+        <PlatformSettings />
+      </ProtectedRoute>
+    ),
+  },
+
+  // --- Divider ---
+  { type: "divider", key: "bottom-divider" },
+
+  // --- Sign Out ---
   {
     type: "collapse",
     name: "Sign Out",
