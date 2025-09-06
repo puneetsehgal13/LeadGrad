@@ -1,0 +1,26 @@
+/* src/index.css */
+.lesson-body {
+  max-width: 900px;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+.lesson-body p {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.87);
+}
+.lesson-body ul,
+.lesson-body ol {
+  margin: 12px 0 12px 24px;
+}
+.lesson-body li {
+  margin: 4px 0;
+}
+.lesson-body img,
+.lesson-body iframe,
+.lesson-body video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.lesson-body figure {
+  margin: 0 0 12px;
+}

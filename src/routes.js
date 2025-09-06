@@ -17,6 +17,7 @@ import LearnShell from "pages/learner/LearnShell";
 import InstructorCourses from "pages/instructor/CourseManagement";
 import QuizBuilder from "pages/instructor/QuizBuilder";
 import Gradebook from "pages/instructor/Gradebook";
+import CourseBuilder from "pages/instructor/CourseBuilder";
 
 // Manager
 import TeamDashboard from "pages/manager/TeamDashboard";
@@ -115,6 +116,18 @@ const routes = [
     component: (
       <ProtectedRoute roles={["instructor", "admin"]}>
         <InstructorCourses />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Course Builder",
+    key: "instr-course-builder",
+    icon: <Icon fontSize="small">auto_awesome</Icon>,
+    route: "/instructor/course-builder",
+    component: (
+      <ProtectedRoute>
+        <CourseBuilder />
       </ProtectedRoute>
     ),
   },

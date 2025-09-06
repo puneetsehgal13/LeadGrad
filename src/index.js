@@ -23,6 +23,7 @@ import { MaterialUIControllerProvider } from "context";
 import { ThemeProvider } from "@mui/material/styles";
 
 import theme from "assets/theme";
+import "./index.css";
 
 const container = document.getElementById("app");
 const root = createRoot(container);

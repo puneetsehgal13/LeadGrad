@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { getLesson, markItemComplete } from "../../lib/courses";
 import { useAuth } from "../../context/AuthContext";
 import { useCourseProgress } from "../../context/CourseProgressContext";
+import ensureReadableHtml from "../../lib/ensureReadableHtml";
 
 function toYouTubeEmbed(url) {
   if (!url) return null;
   try {
     const u = new URL(url);
-    if (u.hostname.includes("youtu.be")) {
-      return `https://www.youtube.com/embed/${u.pathname.replace("/", "")}`;
-    }
+    if (u.hostname.includes("youtu.be"))
+      return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
     if (u.hostname.includes("youtube.com")) {
       const id = u.searchParams.get("v");
       if (id) return `https://www.youtube.com/embed/${id}`;
@@ -20,13 +20,14 @@ function toYouTubeEmbed(url) {
 }
 
 export default function LessonView() {
-  const { id: lessonId, courseId } = useParams(); // <-- important
+  const { id: lessonId, courseId } = useParams();
   const { user } = useAuth();
   const { toggleComplete } = useCourseProgress();
 
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Hooks first, always
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -42,34 +43,32 @@ export default function LessonView() {
     };
   }, [lessonId]);
 
+  // ✅ These hooks run every render (even when data not ready), so order is stable
+  const bodyHtml = useMemo(() => ensureReadableHtml(lesson?.html || ""), [lesson?.html]);
+  const ytEmbed = useMemo(() => toYouTubeEmbed(lesson?.video_url || null), [lesson?.video_url]);
+
+  // ⬇️ Only now do conditional returns (after all hooks are declared)
+  if (loading) return <div style={{ padding: 16 }}>Loading…</div>;
+  if (!lesson) return <div style={{ padding: 16 }}>Lesson not found.</div>;
+
   async function onMarkComplete() {
-    if (!user || !lesson) return;
-    // course_items_view.id is 'lesson:<uuid>' — we need the outline item id; easiest is to
-    // store completion by composite key, but for demo we’ll just no-op if missing.
-    // If you pass the item id via context, call markItemComplete(user.id, courseId, itemId).
+    // If you pass item ids, call markItemComplete(user.id, courseId, itemId) here.
     toggleComplete(lessonId, true);
   }
-
-  if (loading) return null;
-  if (!lesson) return <div>Lesson not found.</div>;
-
-  const yt = toYouTubeEmbed(lesson.video_url);
 
   return (
     <div>
       <h2 style={{ marginTop: 0 }}>{lesson.title}</h2>
 
-      {/* YouTube (iframe) */}
-      {yt && (
+      {ytEmbed && (
         <div style={{ margin: "12px 0" }}>
           <div style={{ position: "relative", paddingTop: "56.25%" }}>
             <iframe
-              src={yt}
-              title="YouTube video"
+              src={ytEmbed}
+              title="Video"
               style={{
                 position: "absolute",
-                top: 0,
-                left: 0,
+                inset: 0,
                 width: "100%",
                 height: "100%",
                 border: 0,
@@ -82,8 +81,7 @@ export default function LessonView() {
         </div>
       )}
 
-      {/* Direct MP4 (if you ever set video_url to an MP4) */}
-      {!yt && lesson.video_url && (
+      {!ytEmbed && lesson.video_url && (
         <div style={{ margin: "12px 0" }}>
           <video
             src={lesson.video_url}
@@ -93,8 +91,7 @@ export default function LessonView() {
         </div>
       )}
 
-      {/* Rich HTML body: can include images/pdf/audio */}
-      <article dangerouslySetInnerHTML={{ __html: lesson.html || "<p>—</p>" }} />
+      <article className="lesson-body" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
 
       <div style={{ marginTop: 16 }}>
         <button className="btn btn-success" onClick={onMarkComplete}>
