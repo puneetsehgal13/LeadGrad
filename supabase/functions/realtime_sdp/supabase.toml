@@ -1,0 +1,2 @@
+[functions.realtime_sdp]
+verify_jwt = false

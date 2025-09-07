@@ -149,7 +149,7 @@ export default function SignIn() {
                 onClick={handleSetRememberMe}
                 sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
               >
-                &nbsp;&nbsp;Remember me
+                &nbsp;&nbsp;learner@leadgrad.com, Password = learner
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>

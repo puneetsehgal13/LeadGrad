@@ -12,6 +12,9 @@ import Assignments from "pages/learner/Assignments";
 import Certificates from "pages/learner/Certificates";
 import CourseOverview from "pages/learner/CourseOverview";
 import LearnShell from "pages/learner/LearnShell";
+import QuizHub from "pages/learner/QuizHub";
+import QuizView from "pages/learner/QuizView";
+import CommunicationCoach from "pages/learner/CommunicationCoach";
 
 // Instructor
 import InstructorCourses from "pages/instructor/CourseManagement";
@@ -28,6 +31,8 @@ import AssignCourses from "pages/manager/AssignCourses";
 import UsersAdmin from "pages/admin/Users";
 import RolesAdmin from "pages/admin/Roles";
 import PlatformSettings from "pages/admin/PlatformSettings";
+
+import MDTypography from "components/MDTypography";
 
 const routes = [
   // ---------- Public ----------
@@ -70,9 +75,17 @@ const routes = [
   { type: "title", title: "Learner", key: "learner-title" },
   {
     type: "collapse",
-    name: "My Courses",
+    name: (
+      <MDTypography component="span" sx={{ color: "success.main", fontWeight: 600 }}>
+        MY COURSES
+      </MDTypography>
+    ),
     key: "learner-my-courses",
-    icon: <Icon fontSize="small">school</Icon>,
+    icon: (
+      <Icon fontSize="small" sx={{ color: "success.main" }}>
+        school
+      </Icon>
+    ),
     route: "/learner/courses",
     component: (
       <ProtectedRoute>
@@ -81,6 +94,78 @@ const routes = [
     ),
   },
   {
+    type: "collapse",
+    name: (
+      <MDTypography component="span" sx={{ color: "success.main", fontWeight: 600 }}>
+        AI COMMUNICATION COACH
+      </MDTypography>
+    ),
+    key: "learner-comm-coach",
+    icon: (
+      <Icon fontSize="small" sx={{ color: "success.main" }}>
+        record_voice_over
+      </Icon>
+    ),
+    route: "/learner/coach",
+    component: (
+      <ProtectedRoute>
+        <CommunicationCoach />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: (
+      <MDTypography component="span" sx={{ color: "success.main", fontWeight: 600 }}>
+        QUIZ BUILDER
+      </MDTypography>
+    ),
+    key: "learner-quizzes",
+    icon: (
+      <Icon fontSize="small" sx={{ color: "success.main" }}>
+        quiz
+      </Icon>
+    ),
+    route: "/learner/quizzes",
+    component: (
+      <ProtectedRoute>
+        <QuizHub />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: (
+      <MDTypography component="span" sx={{ color: "success.main", fontWeight: 600 }}>
+        COURSES BUILDER
+      </MDTypography>
+    ),
+    key: "instr-course-builder",
+    icon: (
+      <Icon fontSize="small" sx={{ color: "success.main" }}>
+        auto_awesome
+      </Icon>
+    ),
+    route: "/instructor/course-builder",
+    component: (
+      <ProtectedRoute>
+        <CourseBuilder />
+      </ProtectedRoute>
+    ),
+  },
+  // quiz view (not in sidebar)
+  /* {
+    type: "route",
+    name: "Quiz View",
+    key: "quiz-view",
+    route: "/courses/:courseId/learn/quiz/:id",
+    component: (
+      <ProtectedRoute>
+        <QuizView />
+      </ProtectedRoute>
+    ),
+  }, */
+  /* {
     type: "collapse",
     name: "Assignments",
     key: "learner-assignments",
@@ -91,8 +176,8 @@ const routes = [
         <Assignments />
       </ProtectedRoute>
     ),
-  },
-  {
+  }, */
+  /* {
     type: "collapse",
     name: "Certificates",
     key: "learner-certificates",
@@ -104,7 +189,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-
+ */
   // ---------- Instructor ----------
   { type: "title", title: "Instructor", key: "instructor-title" },
   {
@@ -119,18 +204,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
-    type: "collapse",
-    name: "Course Builder",
-    key: "instr-course-builder",
-    icon: <Icon fontSize="small">auto_awesome</Icon>,
-    route: "/instructor/course-builder",
-    component: (
-      <ProtectedRoute>
-        <CourseBuilder />
-      </ProtectedRoute>
-    ),
-  },
+
   {
     type: "collapse",
     name: "Quiz Builder",
@@ -138,7 +212,7 @@ const routes = [
     icon: <Icon fontSize="small">fact_check</Icon>,
     route: "/instructor/quizzes",
     component: (
-      <ProtectedRoute roles={["instructor", "admin"]}>
+      <ProtectedRoute>
         <QuizBuilder />
       </ProtectedRoute>
     ),

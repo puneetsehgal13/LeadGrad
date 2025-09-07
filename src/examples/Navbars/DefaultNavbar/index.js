@@ -124,7 +124,7 @@ function DefaultNavbar({ transparent, light, action }) {
           />
           <DefaultNavbarLink
             icon="key"
-            name="sign in"
+            name="E mail = learner@leadgrad.com, Password = learner"
             route="/authentication/sign-in"
             light={light}
           />

@@ -1,12 +1,12 @@
-// src/context/AuthContext.js
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { supabase } from "../lib/supabase";
 
-const AuthCtx = createContext({
+const AuthContext = createContext({
   user: null,
   profile: null,
   loading: true,
-  signOut: async () => {},
+  refreshProfile: async () => null,
 });
 
 export function AuthProvider({ children }) {
@@ -17,32 +17,46 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    async function boot() {
-      const { data } = await supabase.auth.getSession();
-      const u = data?.session?.user || null;
+    async function init() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!mounted) return;
-      setUser(u);
 
-      // optional: load role/profile if you have a profiles table
-      if (u) {
-        const { data: prof } = await supabase
+      const authedUser = session?.user ?? null;
+      setUser(authedUser);
+
+      if (authedUser) {
+        const { data } = await supabase
           .from("profiles")
-          .select("id, role, full_name, avatar_url")
-          .eq("id", u.id)
-          .maybeSingle();
-        if (!mounted) return;
-        setProfile(prof || null);
+          .select("*")
+          .eq("id", authedUser.id)
+          .single();
+        if (mounted) setProfile(data ?? null);
+      } else {
+        setProfile(null);
       }
-
       setLoading(false);
     }
 
-    boot();
+    init();
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      const u = session?.user || null;
-      setUser(u);
-      if (!u) setProfile(null);
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const authedUser = session?.user ?? null;
+      setUser(authedUser);
+
+      if (!authedUser) {
+        setProfile(null);
+        return;
+      }
+
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authedUser.id)
+        .single()
+        .then(({ data }) => setProfile(data ?? null));
     });
 
     return () => {
@@ -51,19 +65,26 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const value = useMemo(
-    () => ({
-      user,
-      profile,
-      loading,
-      signOut: async () => {
-        await supabase.auth.signOut();
-      },
-    }),
-    [user, profile, loading]
-  );
+  const refreshProfile = async () => {
+    if (!user) return null;
+    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+    setProfile(data ?? null);
+    return data;
+  };
 
-  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, profile, loading, refreshProfile }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export const useAuth = () => useContext(AuthCtx);
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+export default AuthContext;
